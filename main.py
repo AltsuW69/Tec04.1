@@ -60,6 +60,7 @@ while running:
 # Calculate distance between the two players
     distance = ((player1.position_x - player2.position_x) ** 2 + (player1.position_y - player2.position_y) ** 2) ** 0.5
 
+
 #player 1 movement
 
     #left/right

@@ -54,7 +54,7 @@ while running:
 
     pygame.draw.circle(screen, (20, 113, 160), (player1.position_x, player1.position_y), player1.size)
     pygame.draw.circle(screen, (166, 26, 26), (player2.position_x, player2.position_y), player2.size)
-    pygame.draw.rect(screen, (0, 0, 0), (ground.x, ground.y, ground.width, ground.length), 0)
+    pygame.draw.rect(screen, (102, 48, 11), (ground.x, ground.y, ground.width, ground.length), 0)
     pygame.display.flip()
 
 

@@ -57,6 +57,23 @@ while running:
     pygame.draw.rect(screen, (102, 48, 11), (ground.x, ground.y, ground.width, ground.length), 0)
     pygame.display.flip()
 
+    if keys[pygame.K_d] or keys[pygame.K_a]:
+        if circle1_hitbox.colliderect(circle2_hitbox):
+            if player1.position_x + player1.size > player2.position_x - player2.size and player1.position_x < player2.position_x:
+                player1.position_x = player2.position_x - player2.size - player1.size - 5
+                print("1")
+            if player1.position_x - player1.size < player2.position_x + player2.size and player1.position_x > player2.position_x:
+                player1.position_x = player2.position_x + player2.size + player1.size + 5
+                print("2")
+
+    if keys[pygame.K_l] or keys[pygame.K_j]:
+        if circle2_hitbox.colliderect(circle1_hitbox):
+            if player2.position_x + player2.size > player1.position_x - player1.size and player2.position_x < player1.position_x:
+                player2.position_x = player1.position_x - player1.size - player2.size - 5
+                print("1")
+            if player2.position_x - player2.size < player1.position_x + player1.size and player2.position_x > player1.position_x:
+                player2.position_x = player1.position_x + player2.size + player2.size + 5
+                print("2")
 
 
 
@@ -67,9 +84,12 @@ while running:
     if player1.position_x + player1.size < screen_width:
         if keys[pygame.K_d]:
             player1.move_player_x(1, dt)
+            
     if player1.position_x > 0 + player1.size:
         if keys[pygame.K_a]:
             player1.move_player_x(-1, dt)
+            
+
 
     #fall
     if not circle1_hitbox.colliderect(ground_hitbox):

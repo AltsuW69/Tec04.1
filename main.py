@@ -57,20 +57,19 @@ while running:
     pygame.draw.rect(screen, (0, 0, 0), (ground.x, ground.y, ground.width, ground.length), 0)
     pygame.display.flip()
 
-# Calculate distance between the two players
-    distance = ((player1.position_x - player2.position_x) ** 2 + (player1.position_y - player2.position_y) ** 2) ** 0.5
+
 
 
 #player 1 movement
 
     #left/right
-    if distance < player1.size + player2.size:    
-        if player1.position_x + player1.size < screen_width:
-            if keys[pygame.K_d]:
-                player1.move_player_x(1, dt)
-        if player1.position_x > 0 + player1.size:
-            if keys[pygame.K_a]:
-                player1.move_player_x(-1, dt)
+  
+    if player1.position_x + player1.size < screen_width:
+        if keys[pygame.K_d]:
+            player1.move_player_x(1, dt)
+    if player1.position_x > 0 + player1.size:
+        if keys[pygame.K_a]:
+            player1.move_player_x(-1, dt)
 
     #fall
     if not circle1_hitbox.colliderect(ground_hitbox):
@@ -100,14 +99,13 @@ while running:
 
 #player 2 movement    
         
-    #left/right
-    if distance < player1.size + player2.size:    
-        if player2.position_x + player2.size < screen_width:
-            if keys[pygame.K_l]:
-                player2.move_player_x(1, dt)
-        if player2.position_x > 0 + player2.size:
-            if keys[pygame.K_j]:
-                player2.move_player_x(-1, dt)
+    #left/right   
+    if player2.position_x + player2.size < screen_width:
+        if keys[pygame.K_l]:
+            player2.move_player_x(1, dt)
+    if player2.position_x > 0 + player2.size:
+        if keys[pygame.K_j]:
+            player2.move_player_x(-1, dt)
 
 
     #fall

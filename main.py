@@ -57,24 +57,41 @@ while running:
     pygame.draw.rect(screen, (102, 48, 11), (ground.x, ground.y, ground.width, ground.length), 0)
     pygame.display.flip()
 
-    if keys[pygame.K_d] or keys[pygame.K_a]:
-        if circle1_hitbox.colliderect(circle2_hitbox):
+
+#dont allow colliding with other players
+    if circle1_hitbox.colliderect(circle2_hitbox) or circle2_hitbox.colliderect(circle1_hitbox):
+        
+        if keys[pygame.K_d] or keys[pygame.K_a]:
             if player1.position_x + player1.size > player2.position_x - player2.size and player1.position_x < player2.position_x:
-                player1.position_x = player2.position_x - player2.size - player1.size - 5
-                print("1")
+                if not player1.position_y + 10 < player2.position_y and not player1.position_y - 10 > player2.position_y:
+                    player1.position_x = player2.position_x - player2.size - player1.size - 5
             if player1.position_x - player1.size < player2.position_x + player2.size and player1.position_x > player2.position_x:
-                player1.position_x = player2.position_x + player2.size + player1.size + 5
-                print("2")
+                if not player1.position_y + 10 < player2.position_y and not player1.position_y - 10 > player2.position_y:    
+                    player1.position_x = player2.position_x + player2.size + player1.size + 5
 
-    if keys[pygame.K_l] or keys[pygame.K_j]:
-        if circle2_hitbox.colliderect(circle1_hitbox):
+        if keys[pygame.K_l] or keys[pygame.K_j]:
             if player2.position_x + player2.size > player1.position_x - player1.size and player2.position_x < player1.position_x:
-                player2.position_x = player1.position_x - player1.size - player2.size - 5
-                print("1")
+                if not player2.position_y + 10 < player1.position_y and not player2.position_y - 10 > player1.position_y:    
+                    player2.position_x = player1.position_x - player1.size - player2.size - 5
             if player2.position_x - player2.size < player1.position_x + player1.size and player2.position_x > player1.position_x:
-                player2.position_x = player1.position_x + player2.size + player2.size + 5
-                print("2")
+                if not player2.position_y + 10 < player1.position_y and not player2.position_y - 10 > player1.position_y:   
+                    player2.position_x = player1.position_x + player2.size + player2.size + 5
 
+        if player1.position_y + player1.size > player2.position_y - player2.size and player1.position_y < player2.position_y:
+            player1.position_y = player2.position_y - player2.size - player1.size
+            fall_force1 = 0
+            if fall_force2 < 0:
+                fall_force2 = 20
+            double_check1 = False
+            triple_check1 = False
+        
+        if player2.position_y + player2.size > player1.position_y - player1.size and player2.position_y < player1.position_y:
+            player2.position_y = player1.position_y - player1.size - player2.size
+            fall_force2 = 0
+            if fall_force1 < 0:
+                fall_force1 = 20
+            double_check2 = False
+            triple_check2 = False
 
 
 #player 1 movement
@@ -85,7 +102,7 @@ while running:
         if keys[pygame.K_d]:
             player1.move_player_x(1, dt)
             
-    if player1.position_x > 0 + player1.size:
+    if player1.position_x - player1.size > 0:
         if keys[pygame.K_a]:
             player1.move_player_x(-1, dt)
             
@@ -101,6 +118,7 @@ while running:
         triple_check1 = False
         if player1.position_y + player1.size < ground.length:
             player1.position_y = ground.y - player1.size
+
 
     #jump
     if circle1_hitbox.colliderect(ground_hitbox) or not triple_check1:
@@ -123,7 +141,7 @@ while running:
     if player2.position_x + player2.size < screen_width:
         if keys[pygame.K_l]:
             player2.move_player_x(1, dt)
-    if player2.position_x > 0 + player2.size:
+    if player2.position_x - player2.size > 0:
         if keys[pygame.K_j]:
             player2.move_player_x(-1, dt)
 

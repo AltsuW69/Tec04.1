@@ -17,6 +17,8 @@ x2 = screen_width/4*3
 y2 = screen_length/2
 player_radius = 25
 ground_length = 60
+platform_lenght = 60
+platform_width = screen_width/7
 fall_force1 = 0
 fall_force2 = 0
 double_check1 = False
@@ -29,6 +31,8 @@ screen = pygame.display.set_mode([screen_width, screen_length])
 player1 = Character(x1, y1, player_radius, player_speed)
 player2 = Character(x2, y2, player_radius, player_speed)
 ground = Object(screen_width, screen_length - ground_length/2, 0, screen_length - ground_length)
+platform_1 = Object(platform_width, platform_lenght, screen_width/5 - platform_width/2, screen_length/20*13 - platform_lenght/2)
+platform_2 = Object(platform_width, platform_lenght, screen_width/5*4  - platform_width/2, screen_length/20*13 - platform_lenght/2)
 
 tick_count = 0
 
@@ -46,6 +50,8 @@ while running:
     circle2_hitbox = pygame.Rect(player2.position_x - player2.size, player2.position_y - player2.size, player2.size * 2, player2.size * 2)
     pygame.draw.rect(screen, (0, 0, 255), circle2_hitbox, 2)
     ground_hitbox = pygame.Rect(ground.x, ground.y, ground.width, ground.length)
+    platform1_hitbox = pygame.Rect(platform_1.x, platform_1.y, platform_1.width, platform_1.length)
+    platform2_hitbox = pygame.Rect(platform_2.x, platform_2.y, platform_2.width, platform_2.length)
 
 
 
@@ -55,6 +61,8 @@ while running:
     pygame.draw.circle(screen, (20, 113, 160), (player1.position_x, player1.position_y), player1.size)
     pygame.draw.circle(screen, (166, 26, 26), (player2.position_x, player2.position_y), player2.size)
     pygame.draw.rect(screen, (102, 48, 11), (ground.x, ground.y, ground.width, ground.length), 0)
+    pygame.draw.rect(screen, (102, 48, 11), (platform1_hitbox), 0)
+    pygame.draw.rect(screen, (102, 48, 11), (platform2_hitbox), 0)
     pygame.display.flip()
 
 
@@ -63,18 +71,18 @@ while running:
         
         if keys[pygame.K_d] or keys[pygame.K_a]:
             if player1.position_x + player1.size > player2.position_x - player2.size and player1.position_x < player2.position_x:
-                if not player1.position_y + 10 < player2.position_y and not player1.position_y - 10 > player2.position_y:
+                if not player1.position_y + player1.size < player2.position_y and not player1.position_y - player1.size > player2.position_y:
                     player1.position_x = player2.position_x - player2.size - player1.size - 5
             if player1.position_x - player1.size < player2.position_x + player2.size and player1.position_x > player2.position_x:
-                if not player1.position_y + 10 < player2.position_y and not player1.position_y - 10 > player2.position_y:    
+                if not player1.position_y + player1.size < player2.position_y and not player1.position_y - player1.size > player2.position_y:    
                     player1.position_x = player2.position_x + player2.size + player1.size + 5
 
         if keys[pygame.K_l] or keys[pygame.K_j]:
             if player2.position_x + player2.size > player1.position_x - player1.size and player2.position_x < player1.position_x:
-                if not player2.position_y + 10 < player1.position_y and not player2.position_y - 10 > player1.position_y:    
+                if not player2.position_y + player2.size < player1.position_y and not player2.position_y - player2.size > player1.position_y:    
                     player2.position_x = player1.position_x - player1.size - player2.size - 5
             if player2.position_x - player2.size < player1.position_x + player1.size and player2.position_x > player1.position_x:
-                if not player2.position_y + 10 < player1.position_y and not player2.position_y - 10 > player1.position_y:   
+                if not player2.position_y + player2.size < player1.position_y and not player2.position_y - player2.size > player1.position_y:   
                     player2.position_x = player1.position_x + player2.size + player2.size + 5
 
         if player1.position_y + player1.size > player2.position_y - player2.size and player1.position_y < player2.position_y:

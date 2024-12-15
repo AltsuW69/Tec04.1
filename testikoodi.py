@@ -7,13 +7,14 @@ from players import Player
 
 pygame.init()
 screen = pygame.display.set_mode([1900, 900])
-
+font = pygame.font.Font(None, 36)
 
 running = True
 tick_count = 0
+damage_time = 0
 clock = pygame.time.Clock()
 
-player = Player(100, 100, 40, 40, 200, 850)
+player = Player(100, 100, 40, 40, 300, 850, "blue")
 
 gameObjects: List[Object] = []
 
@@ -39,9 +40,6 @@ for line in file.readlines():
     elif t == "p":
         new_gameobject = Object(x, y, w, h)
         gameObjects.append(new_gameobject)
-
-    
-print(gameObjects)
 
 
 while running:
@@ -75,8 +73,13 @@ while running:
 
     player.vy += 30
 
+    spike_check = player.move(dt, gameObjects)
+    if spike_check and tick_count - damage_time > 2:
 
-    player.move(dt, gameObjects)
+        damage_time = tick_count
+        player.damage(1)
+
+
 
     if not keys[pygame.K_a] and not keys[pygame.K_d]:
         player.moving_x = False
@@ -88,17 +91,24 @@ while running:
         if player.vx < 0:
             player.vx += 25
     
+    if player.health <= 0:
+        player.death()
+        running = False
+
     if player.vy == 0:
         player.double = False
         player.triple = False
-        
-    player.render(screen)
-    
+
+#render stuff
     for g in gameObjects:
         g.render(screen)
-
+    
+    player.render(screen)
+    
+    text_surface = font.render(str(f"Health:{player.health}"), True, (0, 0, 0))
+    screen.blit(text_surface, (15, 10))
+    
     pygame.display.flip()
-
 
 
     tick_count += 1

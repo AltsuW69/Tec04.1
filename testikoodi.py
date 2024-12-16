@@ -11,10 +11,11 @@ font = pygame.font.Font(None, 36)
 
 running = True
 tick_count = 0
+jump_time = 0
 damage_time = 0
 clock = pygame.time.Clock()
 
-player = Player(100, 100, 40, 40, 300, 850, "blue")
+player = Player(150, 100, 60, 60, 300, 850, "yellow")
 
 gameObjects: List[Object] = []
 
@@ -51,14 +52,11 @@ while running:
         if event.type == pygame.QUIT:
             running = False
 
-    if not player.triple:
-        if keys[pygame.K_w] and not player.double:
-            player.vy = -player.jump_force
-            jump_time = tick_count
-            player.double = True
-        if keys[pygame.K_w] and tick_count - jump_time > 20:
-            player.vy = -player.jump_force
-            player.triple = True
+    
+    if keys[pygame.K_w] and player.jump_count < 2 and tick_count - jump_time > 20:
+        player.vy = -player.jump_force
+        jump_time = tick_count
+        player.jump_count += 1
     if keys[pygame.K_a]:
         player.moving_x = True
         player.vx = -player.speed
@@ -66,10 +64,6 @@ while running:
         player.moving_x = True
         player.vx = player.speed
 
-    image = pygame.image.load("forest.png").convert_alpha()
-    image = pygame.transform.scale(image, (1900, 900))
-    screen.fill((255, 255, 255))
-    screen.blit(image, (0, 0))
 
     player.vy += 30
 
@@ -96,17 +90,18 @@ while running:
         running = False
 
     if player.vy == 0:
-        player.double = False
-        player.triple = False
+        player.jump_count = 0
 
 #render stuff
+    image = pygame.image.load("forest.png").convert_alpha()
+    image = pygame.transform.scale(image, (1900, 900))
+    screen.fill((255, 255, 255))
+    screen.blit(image, (0, 0))
+
+    player.render(screen, font)
+
     for g in gameObjects:
         g.render(screen)
-    
-    player.render(screen)
-    
-    text_surface = font.render(str(f"Health:{player.health}"), True, (0, 0, 0))
-    screen.blit(text_surface, (15, 10))
     
     pygame.display.flip()
 

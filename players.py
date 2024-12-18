@@ -1,9 +1,11 @@
 import pygame
+import math
+from bullet import Bullet
 from spike import Spike
 class Player:
-    
 
-    def __init__(self, x, y, width, length, speed, jump, color):
+
+    def __init__(self, x, y, width, length, speed, jump, color, rgb):
         self.vx = 0
         self.vy = 0
         self.x = x
@@ -18,8 +20,34 @@ class Player:
         self.health = 100
         self.going_right = True
         self.color = (f"Player_{color}")
+        self.rgb = rgb
+        self.bullet_damage = 10  # Damage each bullet deals
+        self.bullets = []  # List to store active bullets
+        self.gun_length = 30
+        
 
+    def shoot(self, mouse_pos):
+        gun_center = pygame.math.Vector2(self.rect.centerx, self.rect.centery)
+        direction = pygame.math.Vector2(mouse_pos[0] - gun_center.x, mouse_pos[1] - gun_center.y)
+        bullet = Bullet(gun_center.x, gun_center.y, direction, 500, self.bullet_damage, self.rgb)
+        self.bullets.append(bullet)
 
+    def update_bullets(self, dt, targets, gameObjects, screen):
+        for bullet in self.bullets:
+            if bullet.active:
+                bullet.move(dt)
+                for target in targets:
+                    if bullet.is_leathal:
+                        if bullet.check_collision(target):
+                            target.damage(bullet.damage)  # Apply damage to the target
+                    elif not bullet.check_collision(target):
+                        bullet.is_leathal = True
+
+                for object in gameObjects:
+                    bullet.check_collision(object)
+                bullet.render(screen)
+            else:
+                del bullet
 
     def move(self, dt, gameObjects):
         x_step = self.vx
@@ -89,5 +117,5 @@ class Player:
             text_y = self.rect.y - 25
         elif self.rect.y < 25:
             text_y = 0
-        text_surface = font.render(str(f"Health:{self.health}"), True, (0, 0, 0))
+        text_surface = font.render(str(f"Health:{self.health}"), True, (self.rgb))
         screen.blit(text_surface, (self.rect.x - 25, text_y))

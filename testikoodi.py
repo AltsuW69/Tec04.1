@@ -1,9 +1,11 @@
 import pygame
+import random
 from typing import List
 from objects import Object
 from spike import Spike
 from players import Player
 from bullet import Bullet
+
 
 pygame.init()
 screen = pygame.display.set_mode([1900, 900])
@@ -33,7 +35,11 @@ gameObjects: List[Object] = []
 def load_map():
     global gameObjects
     gameObjects.clear()
-    with open ("stage1.txt") as file:
+    gameObjects.append(Object(-1,-900,1,1800))
+    gameObjects.append(Object(1900,-900,1,1800))
+    stage = random.randint(1,6)
+    with open (f"stages\\stage{stage}.txt") as file:
+#        line = file.readline()
         for line in file.readlines():
             data = line.rstrip().split(",")
             if len(data) != 5:
@@ -56,7 +62,7 @@ jump_time = 0
 running = True
 clicked = False
 # Buttons
-exit_button = pygame.Rect(850, 800, 300, 100)
+exit_button = pygame.Rect(800, 800, 300, 100)
 return_to_lobby_button = pygame.Rect(800, 500, 300, 100)
 
 def reset_game():
@@ -128,10 +134,10 @@ while running:
 
         # Exit Button
         if exit_button.collidepoint(mouse_pos):
-            pygame.draw.rect(screen, (200, 0, 0), exit_button)
+            pygame.draw.rect(screen, (0, 0, 0), exit_button)
             if mouse_click[0]: running = False
         else:
-            pygame.draw.rect(screen, (255, 0, 0), exit_button)
+            pygame.draw.rect(screen, (0, 0, 0), exit_button)
 
         exit_text = font.render("EXIT", True, (255, 255, 255))
         screen.blit(exit_text, exit_text.get_rect(center=exit_button.center))
@@ -151,7 +157,7 @@ while running:
         if click[2]:
             player.shoot(pygame.mouse.get_pos())
 
-        if keys[pygame.K_w] and player.jump_count < 2 and tick_count - jump_time > 20:
+        if keys[pygame.K_w] and player.jump_count < 2 and tick_count - jump_time > 10 or keys[pygame.K_SPACE] and player.jump_count < 2 and tick_count - jump_time > 20:
             player.vy = -player.jump_force
             jump_time = tick_count
             player.jump_count += 1
@@ -189,11 +195,11 @@ while running:
         image = pygame.image.load("forest.png").convert_alpha()
         image = pygame.transform.scale(image, (1900, 900))
         screen.blit(image, (0, 0))
+        for g in gameObjects: 
+            g.render(screen)
 
         player.render(screen, font)
         player.update_bullets(dt, targets, gameObjects, screen)
-        for g in gameObjects: 
-            g.render(screen)
         pygame.display.flip()
         tick_count += 1
 

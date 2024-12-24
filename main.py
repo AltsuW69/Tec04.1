@@ -56,7 +56,7 @@ jump_time = 0
 running = True
 clicked = False
 # Buttons
-exit_button = pygame.Rect(850, 800, 300, 100)
+exit_button = pygame.Rect(800, 800, 300, 100)
 return_to_lobby_button = pygame.Rect(800, 500, 300, 100)
 
 def reset_game():

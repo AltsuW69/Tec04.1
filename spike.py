@@ -18,6 +18,14 @@ class Spike(Object):
             row_y = y - (rect_height * (i + 1))
             # Add the rectangle for this level
             self.rects.append(pygame.Rect(row_x, row_y, row_width, rect_height))
+            # Calculate the width of the current level
+            row_width = w * (1 - (i / num_levels))
+            # Center the row horizontally
+            row_x = x + (w - row_width) / 2
+            # Position the row below the base (invert the logic)
+            row_y = y + (rect_height * i)
+            # Add the rectangle for this level
+            self.rects.append(pygame.Rect(row_x, row_y, row_width, rect_height))
 
 
         self.x = x
@@ -52,9 +60,9 @@ class Spike(Object):
                 return True 
     
     def render(self, screen):
-#        pygame.draw.rect(screen, (150, 30, 0), self.rect)
-#        for rect in self.rects:
-#            pygame.draw.rect(screen, (150, 30, 0), rect)
+        pygame.draw.rect(screen, (150, 30, 0), self.rect)
+        for rect in self.rects:
+            pygame.draw.rect(screen, (150, 30, 0), rect)
         self.animation_timer += 1
 
         if self.animation_timer >= 5:

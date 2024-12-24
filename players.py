@@ -44,7 +44,8 @@ class Player:
                         bullet.is_leathal = True
 
                 for object in gameObjects:
-                    bullet.check_collision(object)
+                    if not isinstance(object, Spike):
+                        bullet.check_collision(object)
                 bullet.render(screen)
             else:
                 del bullet
@@ -72,6 +73,9 @@ class Player:
 #move position y
         self.rect.move_ip(0, y_step * dt)
         
+        if self.rect.y > 1900:
+            self.damage(100)
+
         for object in gameObjects:
             if not isinstance(object, Spike):
                 if self.rect.colliderect(object):
@@ -92,11 +96,14 @@ class Player:
                     collided = True
         return collided
 
+
     def damage(self,amount):
         self.health -= amount
 
+
     def death(self):
         print("death")
+
 
     def render(self, screen, font):   
 #render the player

@@ -18,13 +18,16 @@ class Player:
         self.moving_x = False
         self.rect = pygame.Rect(x, y, width, length)
         self.health = 100
-        self.going_right = True
+        if x < 950:    
+            self.going_right = True
+        else:
+            self.going_right = False
         self.color = (f"Player_{color}")
         self.rgb = rgb
         self.bullet_damage = 10  # Damage each bullet deals
         self.bullets = []  # List to store active bullets
         self.gun_length = 30
-        
+
 
     def shoot(self, mouse_pos):
         gun_center = pygame.math.Vector2(self.rect.centerx, self.rect.centery)
@@ -120,9 +123,12 @@ class Player:
             arrow = pygame.transform.scale(arrow,(40,30))
             screen.blit(arrow, (self.rect.x + self.width/2 - 20, arrow_y))
 #render the health and name
-        if self.rect.y >= 25:
-            text_y = self.rect.y - 25
-        elif self.rect.y < 25:
-            text_y = 0
-        text_surface = font.render(str(f"Health:{self.health}"), True, (self.rgb))
-        screen.blit(text_surface, (self.rect.x - 25, text_y))
+        #if self.rect.y >= 25:
+        #    text_y = self.rect.y - 25
+        #elif self.rect.y < 25:
+        #    text_y = 0
+        #text_surface = font.render(str(f"Health:{self.health}"), True, (self.rgb))
+        #screen.blit(text_surface, (self.rect.x - 25, text_y))
+        pygame.draw.rect(screen, (0, 0, 0), pygame.Rect(self.rect.x -46, self.rect.y - 51, 152, 12))
+        for h in range(self.health):
+            pygame.draw.rect(screen, (self.rgb), pygame.Rect(self.rect.x + 1.5*h -45 , self.rect.y - 50, 2, 10))

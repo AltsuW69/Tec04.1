@@ -22,7 +22,9 @@ class Bullet:
         self.y += self.vy * dt
 
     def render(self, screen):
+        pygame.draw.circle(screen, (255,255,255) , (int(self.x), int(self.y)), self.radius +2)
         pygame.draw.circle(screen, self.color, (int(self.x), int(self.y)), self.radius)
+
 
     def check_collision(self, target):
         if target.rect.collidepoint(self.x, self.y):  # Bullet hits the target

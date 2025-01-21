@@ -1,70 +1,117 @@
-import socket
-import threading
+import random
+import asyncio
+import websockets
 import json
-import time
+from enum import Enum
 
-# Server configuration
-HOST = '0.0.0.0'
-PORT = 5555
-TICK_RATE = 30  # Updates per second
+class GameState(Enum):
+    WAITING = "waiting"
+    RUNNING = "running"
+    FINISHED = "finished"
 
-# Game state: keeps track of players and bullets
-game_state = {"players": {}, "bullets": []}
-clients = {}
+class GameServer:
+    def _init_(self, min_players=2):
+        self.clients = {}
+        self.game_state = {
+            "snakes": {},  # Will store all snake positions by client_id
+            "food": []    # List of boosts (food) positions
+        }
+        self.current_state = GameState.WAITING
+        self.min_players = min_players
 
-def handle_client(client_socket, addr):
-    """Handles incoming data and updates the game state for a specific client."""
-    player_id = addr[1]  # Use client port as unique ID
-    game_state["players"][player_id] = {"x": 150, "y": 100, "health": 100, "color": None, "bullets": []}
-    print(f"Player {player_id} connected.")
+    def spawn_boosts(self, count, world_size):
+        return [
+            {"x": random.randint(-world_size, world_size), "y": random.randint(-world_size, world_size)}
+            for _ in range(count)
+        ]
+        
+    async def broadcast_state(self):
+        state_update = {
+            "status": self.current_state.value,
+            "game_state": self.game_state,
+            "player_count": len(self.clients)
+        }
+        print(f"Broadcasting state: {state_update}")
 
-    try:
-        while True:
-            data = client_socket.recv(1024).decode('utf-8')
-            if not data:
-                break
-
-            action = json.loads(data)
-
-            # Update the player's game state
-            if action["type"] == "update":
-                game_state["players"][player_id].update(action["data"])
-            elif action["type"] == "shoot":
-                bullet = action["data"]
-                bullet["player_id"] = player_id  # Attach bullet to player
-                game_state["bullets"].append(bullet)
-    except:
-        print(f"Player {player_id} disconnected.")
-    finally:
-        # Clean up on disconnect
-        del game_state["players"][player_id]
-        del clients[player_id]
-        client_socket.close()
-
-def broadcast_game_state():
-    """Sends the entire game state to all connected clients."""
-    while True:
-        state_json = json.dumps(game_state)
-        for conn in clients.values():
+        for client in list(self.clients.values()):
             try:
-                conn.sendall(state_json.encode('utf-8'))
-            except:
+                await client.send(json.dumps(state_update))
+            except websockets.ConnectionClosed:
                 continue
-        time.sleep(1 / TICK_RATE)
 
-def start_server():
-    """Main server loop: accepts connections and assigns threads."""
-    server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server.bind((HOST, PORT))
-    server.listen()
-    print(f"Server started on {HOST}:{PORT}")
+    async def check_game_state(self):
+        while True:
+            if self.current_state == GameState.WAITING and len(self.clients) >= self.min_players:
+                self.current_state = GameState.RUNNING
+                print("Game state changed to RUNNING.")
+                self.game_state['food'] = self.spawn_boosts(5, 100)  # spawn 5 boosts on the start
+                await self.broadcast_state()
 
-    threading.Thread(target=broadcast_game_state, daemon=True).start()
+            if self.current_state == GameState.RUNNING and len(self.clients) < self.min_players:
+                self.current_state = GameState.WAITING
+                print("Game state changed to WAITING.")
+                await self.broadcast_state()
 
-    while True:
-        client_socket, addr = server.accept()
-        clients[addr[1]] = client_socket
-        threading.Thread(target=handle_client, args=(client_socket, addr), daemon=True).start()
+            if self.current_state == GameState.RUNNING:
+                # Periodically regenerate boosts (food) every 5 seconds
+                self.game_state['food'] = self.spawn_boosts(5, 100)
+                await self.broadcast_state()
 
-if __name__ == "__main__":
-    start_server()
+            await asyncio.sleep(5)
+
+    async def handle_client(self, websocket, path):
+        client_id = str(id(websocket))
+        self.clients[client_id] = websocket
+        self.game_state["snakes"][client_id] = []  # Initialize empty snake for new client
+        print(f"New client connected: {client_id}")
+
+        try:
+            # Send initial state to new client
+            await websocket.send(json.dumps({
+                "client_id": client_id,
+                "status": self.current_state.value,
+                "game_state": self.game_state,
+                "player_count": len(self.clients)
+            }))
+
+            # Broadcast updated player count to all clients
+            await self.broadcast_state()
+
+            async for message in websocket:
+                try:
+                    if self.current_state == GameState.RUNNING:
+                        data = json.loads(message)
+                        self.game_state['snakes'][client_id] = data
+                        # Broadcast immediately after receiving an update
+                        await self.broadcast_state()
+                except json.JSONDecodeError:
+                    print(f"Invalid message from {client_id}: {message}")
+
+        except websockets.ConnectionClosed:
+            print(f"Client disconnected: {client_id}")
+        finally:
+            self.clients.pop(client_id, None)
+            self.game_state["snakes"].pop(client_id, None)
+            self.game_state["scores"].pop(client_id, None)
+            
+            if len(self.clients) < self.min_players:
+                self.current_state = GameState.WAITING
+                print("Not enough players, game state reset to WAITING.")
+            
+            await self.broadcast_state()
+
+async def main():
+    game_server = GameServer(min_players=2)
+    
+    async def handler(websocket, path):
+        await game_server.handle_client(websocket, path)
+
+    server = await websockets.serve(handler, "localhost", 8081)
+    print("Server started at ws://localhost:8081")
+    await asyncio.gather(
+        server.wait_closed(), 
+        game_server.check_game_state()
+    )
+
+if _name_ == "_main_":
+    asyncio.run(main())

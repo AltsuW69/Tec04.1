@@ -60,9 +60,9 @@ class Spike(Object):
                 return True 
     
     def render(self, screen):
-        pygame.draw.rect(screen, (150, 30, 0), self.rect)
-        for rect in self.rects:
-            pygame.draw.rect(screen, (150, 30, 0), rect)
+#        pygame.draw.rect(screen, (150, 30, 0), self.rect)
+#        for rect in self.rects:
+ #           pygame.draw.rect(screen, (150, 30, 0), rect)
         self.animation_timer += 1
 
         if self.animation_timer >= 5:

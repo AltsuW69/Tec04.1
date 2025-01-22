@@ -4,10 +4,34 @@ from typing import List
 from objects import Object
 from spike import Spike
 from players import Player
-from bullet import Bullet
-
-
+import os
 pygame.init()
+
+def cd_folder(folder_name):
+    """
+    Change the current working directory to a specified folder.
+
+    :param folder_name: Name of the folder to switch to.
+    """
+    try:
+        # Get the current working directory
+        current_dir = os.getcwd()
+        
+        # Build the target path
+        target_path = os.path.join(current_dir, folder_name)
+        
+        # Change to the target directory
+        os.chdir(target_path)
+        print(f"Switched to directory: {os.getcwd()}")
+    except FileNotFoundError:
+        print(f"Error: The folder '{folder_name}' does not exist in '{current_dir}'.")
+    except PermissionError:
+        print(f"Error: Permission denied to access the folder '{folder_name}'.")
+    except Exception as e:
+        print(f"An unexpected error occurred: {e}")
+
+cd_folder("ball_game")  # Change to "ball_game" folder in the current directory
+
 screen = pygame.display.set_mode([1900, 900])
 font = pygame.font.Font(None, 36)
 
@@ -31,8 +55,6 @@ player = None
 targets: List[Player] = []
 gameObjects: List[Object] = []
 stages = []
-spawnsx = []
-spawnsy = []
 
 # Load the game map initially
 def load_map():
@@ -77,12 +99,10 @@ exit_button = pygame.Rect(800, 800, 300, 100)
 return_to_lobby_button = pygame.Rect(800, 500, 300, 100)
 
 def reset_game():
-    global targets, tick_count, jump_time, game_state, selected_color, spawnsx, spawnsy
+    global targets, tick_count, jump_time, game_state, selected_color
     targets.clear()
     selected_color = None
     tick_count = jump_time = 0
-    spawnsx = []
-    spawnsy = []
     game_state = LOBBY
 
 # Main Game Loop
@@ -161,16 +181,17 @@ while running:
     elif game_state == PLAYING:
         keys = pygame.key.get_pressed()
         click = pygame.mouse.get_pressed()
+        mouse_pos = pygame.mouse.get_pos()
         # Player input
         if click[0] and not clicked:
             clicked = True 
         elif not click[0] and clicked:
             clicked = False  # Reset the clicking state
-            player.shoot(pygame.mouse.get_pos())
+            player.shoot(mouse_pos)
         if click[2]:
             #player.death()
             #game_state = DEATH_SCREEN
-            player.shoot(pygame.mouse.get_pos())
+            player.shoot(mouse_pos)
 
         if keys[pygame.K_w] and player.jump_count < 2 and tick_count - jump_time > 10 or keys[pygame.K_SPACE] and player.jump_count < 2 and tick_count - jump_time > 20:
             player.vy = -player.jump_force
@@ -215,7 +236,7 @@ while running:
         text_surface = font.render(str(stage), True, (200, 255, 255))
         screen.blit(text_surface, (15, 10))
 
-        player.render(screen, font)
+        player.render(screen, font, mouse_pos)
         player.update_bullets(dt, targets, gameObjects, screen)
         pygame.display.flip()
         tick_count += 1

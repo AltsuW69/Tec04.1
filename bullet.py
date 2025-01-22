@@ -13,7 +13,7 @@ class Bullet:
         self.radius = 5
         self.color = color
         self.active = True  # Bullet is active until it goes off-screen or hits something
-        self.is_leathal = False
+        self.is_lethal = False
 
 
     def move(self, dt):
@@ -28,7 +28,7 @@ class Bullet:
 
     def check_collision(self, target):
         if target.rect.collidepoint(self.x, self.y):  # Bullet hits the target
-            if self.is_leathal:    
+            if self.is_lethal:    
                 self.active = False  # Deactivate the bullet
             return True
         return False

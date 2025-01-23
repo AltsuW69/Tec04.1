@@ -28,6 +28,7 @@ class Player:
         self.gun_length = 30
         self.gun_angle = 0
         
+        
 
     def shoot(self, mouse_pos):
         gun_center = pygame.math.Vector2(self.rect.centerx, self.rect.centery)
@@ -54,6 +55,8 @@ class Player:
                 bullet.render(screen)
             else:
                 del bullet
+                self.bullets = [bullet for bullet in self.bullets if bullet.active]
+                print("yay")
 
     def move(self, dt, gameObjects):
         x_step = self.vx
@@ -78,7 +81,7 @@ class Player:
         # move position y
         self.rect.move_ip(0, y_step * dt)
 
-        if self.rect.y > 1900:
+        if self.rect.y > 1000:
             self.damage(100)
 
         for object in gameObjects:

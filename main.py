@@ -8,11 +8,6 @@ import os
 pygame.init()
 
 def cd_folder(folder_name):
-    """
-    Change the current working directory to a specified folder.
-
-    :param folder_name: Name of the folder to switch to.
-    """
     try:
         # Get the current working directory
         current_dir = os.getcwd()
@@ -60,8 +55,8 @@ stages = []
 def load_map():
     global gameObjects, x1,y0,x2, stage
     gameObjects.clear()
-    gameObjects.append(Object(-1,-900,1,1800))
-    gameObjects.append(Object(1900,-900,1,1800))
+    gameObjects.append(Object(-10,-900,10,2000))
+    gameObjects.append(Object(1900,-900,10,2000))
     if len(stages) == 0:
         for i in range(1,7):
             stages.append(i)
@@ -70,7 +65,6 @@ def load_map():
     with open (f"stages\\stage{stage}.txt") as file:
         for line in file.readlines():
             data = line.rstrip().split(",")
-            print(len(data))
             if len(data) == 3:
                 x1 = int(data[0])
                 x2 = int(data[1])

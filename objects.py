@@ -12,11 +12,14 @@ class Object:
         self.picture = pygame.Surface((self.w, self.h))
         for y in range(self.h):
             for x in range(self.w):
-                gray = random.randint(0, 50)  # Base stone color
-                moss = random.randint(50, 100)   # Moss effect
-                r = gray  # Red channel for stone base
-                g = moss
-                b = gray  # Blue channel for stone
+                gray = random.randint(0, 50)
+                moss = random.randint(70, 100)
+                if gray + moss <= 95:
+                    g = moss
+                else:
+                    g = gray
+                r = gray
+                b = gray
                 self.picture.set_at((x, y), (r, g, b))
 
     def handle_collision(self):

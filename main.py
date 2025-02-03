@@ -7,15 +7,11 @@ from players import Player
 import os
 pygame.init()
 
+ # Change to "ball_game" folder in the current directory
 def cd_folder(folder_name):
     try:
-        # Get the current working directory
         current_dir = os.getcwd()
-        
-        # Build the target path
         target_path = os.path.join(current_dir, folder_name)
-        
-        # Change to the target directory
         os.chdir(target_path)
         print(f"Switched to directory: {os.getcwd()}")
     except FileNotFoundError:
@@ -24,8 +20,7 @@ def cd_folder(folder_name):
         print(f"Error: Permission denied to access the folder '{folder_name}'.")
     except Exception as e:
         print(f"An unexpected error occurred: {e}")
-
-cd_folder("ball_game")  # Change to "ball_game" folder in the current directory
+cd_folder("ball_game") 
 
 screen = pygame.display.set_mode([1900, 900])
 font = pygame.font.Font(None, 36)

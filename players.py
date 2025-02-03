@@ -56,7 +56,6 @@ class Player:
             else:
                 del bullet
                 self.bullets = [bullet for bullet in self.bullets if bullet.active]
-                print("yay")
 
     def move(self, dt, gameObjects):
         x_step = self.vx
